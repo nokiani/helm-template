@@ -1,0 +1,105 @@
+# Default values for helm-template.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Must be:
+# develop
+# test
+# prod
+# env: .Release.Name
+env: dev
+
+# nameOverride is name of service.
+# Required!
+nameOverride: "sb-cits-debts-service"
+fullnameOverride: ""
+
+# replicaCount is pod's count of replicas in deployment
+replicaCount: 1
+# revisionHistoryLimit is number of revision of replicaSet
+revisionHistoryLimit: 5
+
+# image is set of parameters for Deployment
+# image.repoUrl and image.repoGroup must have trailing slash
+image:
+  repoUrl: registry.apps.bcc.kz/govtech-platform/
+  repoGroup: platform-services/
+  pullSecret: gitlab-ci-registry-secret
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: develop
+  hash: "kjh43"
+
+shepSecret: dev-shep-secret
+
+serviceAnnotations:
+  # prometheus.io/path: /api/v1/gov
+  # prometheus.io/scrape: "true"
+
+route:
+  enabled: true
+  host: gov-tech.apps.gov-dev.bcc.kz
+
+volumes:
+  certName:
+    secret:
+      mountPath: /app/cert/gost.p12
+      secretName: shep-cert
+      items:
+        - key: gost.p12
+          path: gost.p12
+  # certName2:
+  #   secret:
+  #     mountPath: /app/cert/gost.p12
+  #     secretName: shep-cert2
+  #     items:
+  #       - key: gost2.p12
+  #         path: gost2.p12
+
+cert:
+  enabled: true
+  vaultPath: openshift/data/gov-dev.bcc.kz/government-technologies
+  vault:
+    AITU_PASSPORT_CLIENT_SECRET: <aitu-passport-client-secret>
+
+envConfig:
+  configShep.tpl:
+  configKafka.tpl:
+
+# Зависит от типов
+settings:
+  SHEP_IS_IGNORE_WSS: true
+  SHEP_IS_WSS_USING: true
+  SHEP_SENDER_ID: centercredit
+  SHEP_SERVICE_ID: CITS_DEBTS
+  SHEP_SIGN_KEY_IDENTIFIER: X509_KEY_IDENTIFIER
+  SHEP_SIGN_KEY_PATH: /app/cert/gost.p12
+  SHEP_SIGN_KEY_TYPE: PKCS12
+  SHEP_URL: http://195.12.113.7/bip-sync-wss-gost/
+  kafka-config__bootstrap-servers: kafka-0.kafka-headless.dev-government-technologies.svc.cluster.local:9092,kafka-1.kafka-headless.dev-government-technologies.svc.cluster.local:9092,kafka-2.kafka-headless.dev-government-technologies.svc.cluster.local:9092
+  kafka-config__enable-kafka: true
+  kafka-config__num-of-partitions: 3
+  kafka-config__replication-factor: 3
+  kafka-config__schema-registry-auto-register: true
+  kafka-config__schema-registry-url: http://apicurio-registry:8080/apis/registry/v2
+  kafka-consumer-config__auto-offset-reset: earliest
+  kafka-consumer-config__auto-startup: false
+  KEY_STORE_BUILDER_PATH: /tmp/container.p12
+  serverPort: 8080
+  server__servlet__context-path: /api/v1/gov/cits-debts
+  SHEP_HTTP_PROXY_HOST: 91.198.63.226
+  SHEP_HTTP_PROXY_PORT: 20608
+  IDP_URL: https://dbp-test.bcc.kz/auth/realms/bank
+  IDP_ROLE_MAP: '{"items" : [{"srcRole": "govtech-user", "destRole": "clients"}]}'
+  auth-config__enable-auth: true
+  auth-config__resource-realm-modules: dbp-modules-govtech
+  log-config__level: INFO
+
+probes:
+  apiUrl: /api/v1/gov/cits-debts
+
+# Захардкодить
+# autoscaling:
+#   minReplicas: 1
+#   maxReplicas: 2
+#   targetCPUUtilizationPercentage: 80
+#   targetMemoryUtilizationPercentage: 80
