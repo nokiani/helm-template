@@ -1,0 +1,17 @@
+apiVersion: v1
+entries:
+  helm-template:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-10-10T13:04:47.115292181+06:00"
+    description: A Helm-template chart for Kubernetes
+    digest: 57e925ea539988ef6d6acc967c1e269df935d39f9058ecee8a3613b27e1c9f7a
+    maintainers:
+    - email: alexey.zolotareff@gmail.com
+      name: Alexey Zolotarev
+    name: helm-template
+    type: application
+    urls:
+    - helm-template-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-10-10T13:04:47.109427649+06:00"
